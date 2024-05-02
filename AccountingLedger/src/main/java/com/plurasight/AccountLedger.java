@@ -76,14 +76,14 @@ public class AccountLedger {
             line = br.readLine();
             while ((line= br.readLine()) != null) {//starts on second line
                 System.out.println(line);
-            }System.out.println(" \n\t ~ End of All Transactions ~ \t ");
+            }System.out.println(" \n\t ~ End of All Transactions ~ \n ");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         toSeeLedger(transactions);
     }
     private static void depositEntries(ArrayList<Transactions> transactions){
-        System.out.println("Only Deposit Transactions");
+        System.out.println("\t ~ Deposit Transactions ~ \n");
         try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))) {
             br.readLine();
             while ((line = br.readLine()) != null) {
@@ -93,6 +93,7 @@ public class AccountLedger {
                     System.out.println(line);
                 }
             }
+            System.out.println("\n\t ~ End of Deposit Transactions ~ \n");
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -113,14 +114,13 @@ public class AccountLedger {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true))){
             writer.write(currentDate + "|" + currentTime + "|" + paymentDescription + "|" + paymentVendor + "|" + paymentAmount +"\n");
             System.out.println("Your transaction has been posted to the Ledger");
-            writer.close();
         } catch (IOException e) {
             System.out.println("Error, please try again");
         }
         goHome();
     }
     private static void paymentEntries(ArrayList<Transactions> transactions){
-        System.out.println("\t ~Payment Transactions~ ");
+        System.out.println("\t ~ Payment Transactions ~ \n");
         try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))) {
             br.readLine();
             String line;
@@ -132,7 +132,7 @@ public class AccountLedger {
                 if (payment < 0) {
                     System.out.println(line);}
             }
-            System.out.println("\n\t ~ End of Payment Transactions ~");
+            System.out.println("\n\t ~ End of Payment Transactions ~ \n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -140,7 +140,7 @@ public class AccountLedger {
     }
     public static void reports(){
         System.out.println(" Please make a selection of what kind of report you would like to see");
-        System.out.println("(1) Month To Date, (2) Previous Month, (3) Year-to-Date, (4) Previous Year (5) Search by vendor");
+        System.out.println("(1) Month To Date \n (2) Previous Month \n (3) Year-to-Date \n (4) Previous Year \n (5) Search by vendor");
         int choice = input.nextInt();
         switch (choice) {
             case 1 -> monthToDate();
@@ -157,6 +157,7 @@ public class AccountLedger {
     }
     // Month to date method, splitting the date format so I am able to reference just one variable
     private static void monthToDate() {
+        System.out.println("\t ~ Month-to-Date Transactions ~ \n");
         LocalDate currentDate = LocalDate.now();
         int currentMonth = currentDate.getMonthValue();
         try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
@@ -175,7 +176,7 @@ public class AccountLedger {
     }
     // previous month method will print out the transaction from the month prior to current date
             private static void previousMonth() {
-                System.out.println("Previous Month Transactions");
+                System.out.println("\t ~ Previous Month Transactions ~ \n");
                 LocalDate currentDate = LocalDate.now();
                 int currentMonth = currentDate.getMonthValue();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
@@ -186,16 +187,17 @@ public class AccountLedger {
                         int inputMonth = Integer.parseInt(data2[1]);
                         if(inputMonth == currentMonth--){
                             System.out.println(line);
-                        }else {
-                            System.out.println("There are no Transactions");}
-                    }} catch (IOException e) {
+                        }
+                    }
+                    System.out.println("\t ~ End of Previous Month Transactions ~ \n");
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                      }
                         reports();
                  }
             // year to date method will display all entries in the current year
             private static void yeartoDate() {
-                System.out.println("Month to date Transactions");
+                System.out.println("\t ~ Year to date Transactions ~ \n");
                 LocalDate currentDate = LocalDate.now();
                 int currentYear = currentDate.getYear();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
@@ -206,15 +208,17 @@ public class AccountLedger {
                         int inputYear = year.getYear();
                         if(inputYear == currentYear){
                             System.out.println(line);
-                        } else {System.out.println("There are no Transactions");}
-                    }} catch (IOException e) {
+                        }
+                    }
+                    System.out.println("\t ~ End of Year to Date Transactions ~ \n ");
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 reports();
             }
             // previous year method
             private static void previousYear( ) {
-                System.out.println("Transactions for the Previous Year \n");
+                System.out.println(" \t ~ Transactions for the Previous Year ~ \n");
                 LocalDate currentDate = LocalDate.now();
                 int currentYear= currentDate.getYear();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
@@ -225,25 +229,29 @@ public class AccountLedger {
                         int inputYear = year.getYear();
                         if(inputYear == currentYear--){
                             System.out.println(line);}
-                            else {
-                                System.out.println("There are no Transactions");}
-            }} catch (IOException e) {
+            }
+                    System.out.println("\t ~ End of Previous Year Transactions ~ \n");
+                } catch (IOException e) {
                     throw new RuntimeException(e);
             }
             reports();
             }
+            // allow user to search the file by vendor name
             private static void vendorSearch() {
                 System.out.println("Please Enter the name of the Vendor");
-                String inputVendor = input.nextLine();
                 input.nextLine();
+                String inputVendor = input.nextLine();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
                     br.readLine();
                     while ((line = br.readLine()) != null) {
                         String[] data = line.split("\\|");
                         String vendor = (data[3]);
-                        if (inputVendor.equalsIgnoreCase(vendor)){
-                            System.out.println(line);}
-                }}  catch (IOException e) {
+                        if (inputVendor.equalsIgnoreCase(vendor)) { // too aovid an error if the casing is off
+                            System.out.println(line);
+                        }
+                    }
+                    System.out.println("\t ~ End of Vendor Search Results ~ \n");
+                }  catch (IOException e) {
                         throw new RuntimeException(e);
                 }
                 reports();
