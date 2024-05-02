@@ -62,7 +62,7 @@ public class AccountLedger {
             case "A" -> allEntries(transactions);
             case "D" -> depositEntries(transactions);
             case "P" -> paymentEntries(transactions);
-            case "R" -> reports(transactions);
+            case "R" -> reports();
             case "H" -> goHome();
             default -> {
                 System.out.println("Error,invalid response");
@@ -77,7 +77,6 @@ public class AccountLedger {
             while ((line= br.readLine()) != null) {//starts on second line
                 System.out.println(line);
             }System.out.println(" \n\t ~ End of All Transactions ~ \t ");
-            br.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -116,7 +115,7 @@ public class AccountLedger {
             System.out.println("Your transaction has been posted to the Ledger");
             writer.close();
         } catch (IOException e) {
-            System.out.println("Error, please try again");;
+            System.out.println("Error, please try again");
         }
         goHome();
     }
@@ -139,51 +138,50 @@ public class AccountLedger {
         }
         toSeeLedger(transactions);
     }
-    public static void reports(ArrayList<Transactions> transactions){
+    public static void reports(){
         System.out.println(" Please make a selection of what kind of report you would like to see");
         System.out.println("(1) Month To Date, (2) Previous Month, (3) Year-to-Date, (4) Previous Year (5) Search by vendor");
         int choice = input.nextInt();
         switch (choice) {
             case 1 -> monthToDate();
-            case 2 -> previousMonth(transactions);
+            case 2 -> previousMonth();
             case 3 -> yeartoDate();
             case 4 -> previousYear();
             case 5 -> vendorSearch();
-            case 6 -> reports(transactions);
+            case 6 -> reports();
             default -> {
                 System.out.println("Error,invalid response");
-                reports(transactions);
+                reports();
             }
         }
     }
-    // Month to date method, splitting the date format so i am able to reference just one variable
+    // Month to date method, splitting the date format so I am able to reference just one variable
     private static void monthToDate() {
         LocalDate currentDate = LocalDate.now();
         int currentMonth = currentDate.getMonthValue();
         try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
+            br.readLine();
             while ((line = br.readLine()) != null) {
                 // first have to split the array
                 String[] data = line.split("\\|");
-                //then have to split the specific data piece you want to pull,
+                //split the specific data piece you want to pull,
                 String [] data2 = data[0].split("-");
                 int curMonth = Integer.parseInt(data2[1]);
                 if (curMonth == currentMonth) {
                     System.out.println(line);}
-                else {
-                    System.out.println("There are no transactions in the current Month");
-                }
             }} catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        } reports();
     }
     // previous month method will print out the transaction from the month prior to current date
-            private static void previousMonth(ArrayList<Transactions> transactions) {
+            private static void previousMonth() {
                 System.out.println("Previous Month Transactions");
                 LocalDate currentDate = LocalDate.now();
                 int currentMonth = currentDate.getMonthValue();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
+                    br.readLine();
                     while ((line = br.readLine()) != null) {
-                        String[] data = line.split("-");
+                        String[] data = line.split("\\|");
                         String [] data2 = data[0].split("-");
                         int inputMonth = Integer.parseInt(data2[1]);
                         if(inputMonth == currentMonth--){
@@ -193,7 +191,7 @@ public class AccountLedger {
                     }} catch (IOException e) {
                     throw new RuntimeException(e);
                      }
-                        reports(transactions);
+                        reports();
                  }
             // year to date method will display all entries in the current year
             private static void yeartoDate() {
@@ -201,17 +199,18 @@ public class AccountLedger {
                 LocalDate currentDate = LocalDate.now();
                 int currentYear = currentDate.getYear();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
+                    br.readLine();
                     while ((line = br.readLine()) != null) {
                         String[] data = line.split("\\|");
-                        String [] data2 = data[0].split("-");
-                        int inputYear = Integer.parseInt(data2[0]);
+                         LocalDate year =LocalDate.parse(data[0]);
+                        int inputYear = year.getYear();
                         if(inputYear == currentYear){
                             System.out.println(line);
                         } else {System.out.println("There are no Transactions");}
                     }} catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                reports(transactions);
+                reports();
             }
             // previous year method
             private static void previousYear( ) {
@@ -219,22 +218,24 @@ public class AccountLedger {
                 LocalDate currentDate = LocalDate.now();
                 int currentYear= currentDate.getYear();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
+                    br.readLine();
                     while ((line = br.readLine()) != null) {
                         String[] data = line.split("\\|");
-                        String [] data2 = data[0].split("-");
-                       int inputYear = Integer.parseInt(data2[0]);
-                        if( inputYear == currentYear--){
+                        LocalDate year =LocalDate.parse(data[0]);
+                        int inputYear = year.getYear();
+                        if(inputYear == currentYear--){
                             System.out.println(line);}
                             else {
                                 System.out.println("There are no Transactions");}
             }} catch (IOException e) {
                     throw new RuntimeException(e);
             }
-            reports(transactions);
+            reports();
             }
             private static void vendorSearch() {
                 System.out.println("Please Enter the name of the Vendor");
                 String inputVendor = input.nextLine();
+                input.nextLine();
                 try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
                     br.readLine();
                     while ((line = br.readLine()) != null) {
@@ -242,11 +243,10 @@ public class AccountLedger {
                         String vendor = (data[3]);
                         if (inputVendor.equalsIgnoreCase(vendor)){
                             System.out.println(line);}
-                            else{ System.out.println("Please enter a valid vendor");
-                }}}  catch (IOException e) {
+                }}  catch (IOException e) {
                         throw new RuntimeException(e);
                 }
-                reports(transactions);
+                reports();
             }
             private static void exit(){
                 System.out.println("~~ Program Closed~~");
