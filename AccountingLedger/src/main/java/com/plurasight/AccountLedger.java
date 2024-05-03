@@ -6,15 +6,18 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class AccountLedger {
     static Scanner input = new Scanner(System.in);
     static ArrayList<Transactions> transactions = new ArrayList<>();
     static String line;
+
     public static void main(String[] args) {
         goHome();
     }
+
     // Displays home screen options
     private static void goHome() {
         System.out.println("Please make a selection:");
@@ -27,9 +30,11 @@ public class AccountLedger {
             case "X" -> exit();
             default -> {
                 System.out.println("Error,invalid response");
+                goHome();
             }
         }
     }
+
     // add Deposit method, prompting user to enter transaction details
     // date formatter used
     //file writer to create the transactions file
@@ -45,14 +50,28 @@ public class AccountLedger {
         System.out.println("Amount: ");
         float amount = input.nextFloat();
         // write to the file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true))){
-            writer.write(userDateTime + "|" + description + "|" + vendor + "|" + amount +"\n") ;
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true))) {
+            writer.write(userDateTime + "|" + description + "|" + vendor + "|" + amount + "\n");
             System.out.println("Your transaction has been posted to the Ledger");
         } catch (IOException e) {
             System.out.println("error");
         }
+        System.out.println("Would you like to add another deposit or return home? Select Y to add another deposit and N to return Home");
+        input.nextLine();
+        String selection = input.nextLine();
+        switch (selection){
+            case "Y": addDeposit();
+            break;
+            case "N": goHome();
+            break;
+            default:
+                System.out.println("Invalid Response, returning home...");
+                goHome();
+        }
 
     }
+
+
     // see Ledger method, prompts user to make a selection
     private static void toSeeLedger(ArrayList<Transactions> transactions) {
         System.out.println("Please Make a Selection");
@@ -121,7 +140,18 @@ public class AccountLedger {
         } catch (IOException e) {
             System.out.println("Error, please try again");
         }
-        goHome();
+        System.out.println("Would you like to add another payment or return home? Select Y to add another deposit and N to return Home");
+        input.nextLine();
+        String selection = input.nextLine();
+        switch (selection){
+            case "Y": addDeposit();
+                break;
+            case "N": goHome();
+                break;
+            default:
+                System.out.println("Invalid Response, returning home...");
+                goHome();
+        }
     }
     // displays all of the payments entered
     // filtered by negative amount
@@ -132,7 +162,6 @@ public class AccountLedger {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split("\\|");
-                //Transactions transactions = new Transactions(data[0],data[1],data[2],data[3],Float.parseFloat(data[4]));
                 float payment;
                 payment = Float.parseFloat(data[4]);
                 if (payment < 0) {
@@ -144,11 +173,11 @@ public class AccountLedger {
         }
         toSeeLedger(transactions);
     }
-    // selection screen for several reports
-    // displays error message if user input invalid response
+        // selection screen for several reports
+        // displays error message if user input invalid response
     public static void reports(){
         System.out.println(" Please make a selection of what kind of report you would like to see");
-        System.out.println("(1) Month To Date \n (2) Previous Month \n (3) Year-to-Date \n (4) Previous Year \n (5) Search by vendor");
+        System.out.println("(1) Month To Date \n (2) Previous Month \n (3) Year-to-Date \n (4) Previous Year \n (5) Search by vendor \n (6) Return Home" );
         int choice = input.nextInt();
         switch (choice) {
             case 1 -> monthToDate();
@@ -156,7 +185,10 @@ public class AccountLedger {
             case 3 -> yeartoDate();
             case 4 -> previousYear();
             case 5 -> vendorSearch();
-            case 6 -> reports();
+            case 6 -> {
+                goHome();
+                input.nextLine(); // allows for input without automatically looping for no response
+            }
             default -> {
                 System.out.println("Error,invalid response");
                 reports();
@@ -191,9 +223,9 @@ public class AccountLedger {
                     br.readLine();
                     while ((line = br.readLine()) != null) {
                         String[] data = line.split("\\|");
-                        LocalDate month = LocalDate.parse(data[1]);
+                        LocalDate month = LocalDate.parse(data[0]);
                         int inputMonth = month.getMonthValue();
-                        if(inputMonth == currentMonth--){
+                        if(inputMonth == (currentMonth-1)){
                             System.out.println(line);
                         }
                     }
@@ -235,10 +267,10 @@ public class AccountLedger {
                         String[] data = line.split("\\|");
                         LocalDate year =LocalDate.parse(data[0]);
                         int inputYear = year.getYear();
-                        if(inputYear == currentYear--){
+                        if(inputYear == (currentYear-1)){
                             System.out.println(line);}
             }
-                    System.out.println("\t ~ End of Previous Year Transactions ~ \n");
+                    System.out.println("\n \t ~ End of Previous Year Transactions ~ \n");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
             }
