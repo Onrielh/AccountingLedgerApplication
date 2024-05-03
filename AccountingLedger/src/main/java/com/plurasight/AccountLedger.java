@@ -15,6 +15,7 @@ public class AccountLedger {
     public static void main(String[] args) {
         goHome();
     }
+    // Displays home screen options
     private static void goHome() {
         System.out.println("Please make a selection:");
         System.out.println(" (D) to Add Deposit \n (P) to Make Payment (DEBIT) \n (L) to see Ledger \n (X) to Exit");
@@ -26,7 +27,6 @@ public class AccountLedger {
             case "X" -> exit();
             default -> {
                 System.out.println("Error,invalid response");
-                goHome();
             }
         }
     }
@@ -51,7 +51,7 @@ public class AccountLedger {
         } catch (IOException e) {
             System.out.println("error");
         }
-        goHome();
+
     }
     // see Ledger method, prompts user to make a selection
     private static void toSeeLedger(ArrayList<Transactions> transactions) {
@@ -65,11 +65,12 @@ public class AccountLedger {
             case "R" -> reports();
             case "H" -> goHome();
             default -> {
-                System.out.println("Error,invalid response");
+                System.out.println("Error,invalid response"); // error handling
                 toSeeLedger(transactions);
             }
         }
     }
+    // displays all entries entered
     private static void allEntries(ArrayList<Transactions> transactions){
         System.out.println("\t ~ All Transaction Entries ~ \n");
         try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))){
@@ -82,6 +83,8 @@ public class AccountLedger {
         }
         toSeeLedger(transactions);
     }
+
+        // displays all of the transactions filtered by positive payments
     private static void depositEntries(ArrayList<Transactions> transactions){
         System.out.println("\t ~ Deposit Transactions ~ \n");
         try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))) {
@@ -100,6 +103,7 @@ public class AccountLedger {
         }
         toSeeLedger(transactions);
     }
+        //prompts user to enter transaction details and negative amount
     private static void makePayment(){
         System.out.println("Please Enter your transaction details below:");
         LocalTime currentTime = LocalTime.now();
@@ -119,6 +123,8 @@ public class AccountLedger {
         }
         goHome();
     }
+    // displays all of the payments entered
+    // filtered by negative amount
     private static void paymentEntries(ArrayList<Transactions> transactions){
         System.out.println("\t ~ Payment Transactions ~ \n");
         try (BufferedReader br = new BufferedReader(new FileReader("transactions.csv"))) {
@@ -138,6 +144,8 @@ public class AccountLedger {
         }
         toSeeLedger(transactions);
     }
+    // selection screen for several reports
+    // displays error message if user input invalid response
     public static void reports(){
         System.out.println(" Please make a selection of what kind of report you would like to see");
         System.out.println("(1) Month To Date \n (2) Previous Month \n (3) Year-to-Date \n (4) Previous Year \n (5) Search by vendor");
@@ -183,8 +191,8 @@ public class AccountLedger {
                     br.readLine();
                     while ((line = br.readLine()) != null) {
                         String[] data = line.split("\\|");
-                        String [] data2 = data[0].split("-");
-                        int inputMonth = Integer.parseInt(data2[1]);
+                        LocalDate month = LocalDate.parse(data[1]);
+                        int inputMonth = month.getMonthValue();
                         if(inputMonth == currentMonth--){
                             System.out.println(line);
                         }
